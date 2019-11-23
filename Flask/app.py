@@ -5,6 +5,8 @@ import pymysql.cursors
 import time
 import hashlib
 from functools import wraps
+import os
+IMAGES_DIR = os.path.join(os.getcwd(), "images")
 
 #Initialize the app from Flask
 app = Flask(__name__)
@@ -78,6 +80,56 @@ def view_further_info(photoID):
     # tags = cursor.fetchall()
 
     return render_template("view_further_info.html", photo=photo, name=name)
+  
+ 
+# ---------------------------- Post A Photo -----------------------------------------------
+@app.route("/upload")
+@login_required
+def upload():
+    return render_template("upload.html")
+
+
+@app.route("/uploadPhoto", methods=["GET", "POST"])
+@login_required
+def uploadPhoto():
+    if request.files:
+        image_file = request.files.get("imageToUpload", "")
+        image_name = image_file.filename
+        filepath = os.path.join(IMAGES_DIR, image_name)
+        image_file.save(filepath) 
+
+        userName = session["username"]
+        allFollowers = "0"
+        caption = request.form.get('caption')
+        display = request.form.get('display')
+
+        #visible to all followers
+        if display == "All Followers":
+            allFollowers = "1"
+            with conn.cursor() as cursor:
+                query = "INSERT INTO Photo (postingDate, filePath, allFollowers, caption, photoPoster) VALUES (%s, %s, %s, %s, %s)"
+                cursor.execute(query, (time.strftime('%Y-%m-%d %H:%M:%S'), image_name, allFollowers, caption, userName))
+
+        #visible to FriendGroup         
+        else:
+            res = display.split(",")
+            groupName = res[0].split(":")[1]
+            groupOwner = res[1].split(":")[1]
+            query1 = "INSERT INTO Photo (postingDate, filePath, allFollowers, caption, photoPoster) VALUES (%s, %s, %s, %s, %s)"
+            #insertion with SharedWith table (not sure???)
+            query2 = "INSERT INTO SharedWith(groupOwner, groupName) VALUES (%s, %s)"
+            with conn.cursor() as cursor:
+                cursor.execute(query1, (time.strftime('%Y-%m-%d %H:%M:%S'), image_name, allFollowers, caption, userName))
+
+        message = "Image has been successfully uploaded."
+        return render_template("upload.html", message=message)
+
+    else:
+        message = "Failed to upload image."
+        return render_template("upload.html", message=message) 
+  
+  
+  
 
 #Define route for login
 @app.route('/login')
