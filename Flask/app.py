@@ -2,6 +2,9 @@
 from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
 
+import time
+import hashlib
+
 #Initialize the app from Flask
 app = Flask(__name__)
 
@@ -10,14 +13,32 @@ conn = pymysql.connect(host='localhost',
                        port = 8889,
                        user='root',
                        password='root',
-                       db='FlaskDemo',
+                       db='finstagram',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
+SALT = 'cs3083'
+
 
 #Define a route to hello function
 @app.route('/')
 def hello():
     return render_template('index.html')
+
+
+# --------------------------------- show visible photos ----------------------------------------------
+@app.route("/photos", methods=["GET"])
+def photos():
+    photoID = "1"
+    cursor = conn.cursor()
+    query = 'SELECT photoID, photoPoster FROM Photo ' \
+           'WHERE photoID IN (SELECT photoID FROM SharedWith ' \
+           'WHERE groupName IN (SELECT groupName FROM BelongTo ' \
+           'WHERE member_username = %s OR owner_username = %s)) ORDER BY postingdate DESC'
+    cursor.execute(query, (photoID, photoID))
+    data = cursor.fetchall()
+    return render_template("photos.html", photos=data)
+
+
 
 #Define route for login
 @app.route('/login')
@@ -39,7 +60,7 @@ def loginAuth():
     #cursor used to send queries
     cursor = conn.cursor()
     #executes query
-    query = 'SELECT * FROM user WHERE username = %s and password = %s'
+    query = 'SELECT * FROM person WHERE username = %s and password = %s'
     cursor.execute(query, (username, password))
     #stores the results in a variable
     data = cursor.fetchone()
@@ -56,38 +77,46 @@ def loginAuth():
         error = 'Invalid login or username'
         return render_template('login.html', error=error)
 
+
 #Authenticates the register
 @app.route('/registerAuth', methods=['GET', 'POST'])
 def registerAuth():
     #grabs information from the forms
     username = request.form['username']
-    password = request.form['password']
-
-    #cursor used to send queries
+    password = request.form['password'] + SALT
+    hashed_password = hashlib.sha256(password.encode('utf - 8')).hexdigest()
+    firstName = request.form["fname"]
+    lastName = request.form["lname"]
+    # cursor used to send queries
     cursor = conn.cursor()
-    #executes query
-    query = 'SELECT * FROM user WHERE username = %s'
+    # executes query
+    query = 'SELECT * FROM person WHERE username = %s'
     cursor.execute(query, (username))
-    #stores the results in a variable
+    # stores the results in a variable
     data = cursor.fetchone()
-    #use fetchall() if you are expecting more than 1 data row
+    # use fetchall() if you are expecting more than 1 data row
     error = None
-    if(data):
-        #If the previous query returns data, then user exists
+    if (data):
+        # If the previous query returns data, then user exists
         error = "This user already exists"
-        return render_template('register.html', error = error)
+        return render_template('register.html', error=error)
     else:
-        ins = 'INSERT INTO user VALUES(%s, %s)'
-        cursor.execute(ins, (username, password))
+        try:
+            with conn.cursor() as cursor:
+                query = "INSERT INTO person (username, password, firstName, lastName) VALUES (%s, %s, %s, %s)"
+                cursor.execute(query, (username, hashed_password, firstName, lastName))
+        except pymysql.err.IntegrityError:
+            error = "%s is already taken." % (username)
+            return render_template('register.html', error=error)
         conn.commit()
         cursor.close()
-        return render_template('index.html')
+        return redirect(url_for("login"))
 
 
 @app.route('/home')
 def home():
     user = session['username']
-    cursor = conn.cursor();
+    cursor = conn.cursor()
     query = 'SELECT ts, blog_post FROM blog WHERE username = %s ORDER BY ts DESC'
     cursor.execute(query, (user))
     data = cursor.fetchall()
@@ -98,7 +127,7 @@ def home():
 @app.route('/post', methods=['GET', 'POST'])
 def post():
     username = session['username']
-    cursor = conn.cursor();
+    cursor = conn.cursor()
     blog = request.form['blog']
     query = 'INSERT INTO blog (blog_post, username) VALUES(%s, %s)'
     cursor.execute(query, (blog, username))
@@ -112,7 +141,7 @@ def select_blogger():
     #username = session['username']
     #should throw exception if username not found
     
-    cursor = conn.cursor();
+    cursor = conn.cursor()
     query = 'SELECT DISTINCT username FROM blog'
     cursor.execute(query)
     data = cursor.fetchall()
@@ -122,7 +151,7 @@ def select_blogger():
 @app.route('/show_posts', methods=["GET", "POST"])
 def show_posts():
     poster = request.args['poster']
-    cursor = conn.cursor();
+    cursor = conn.cursor()
     query = 'SELECT ts, blog_post FROM blog WHERE username = %s ORDER BY ts DESC'
     cursor.execute(query, poster)
     data = cursor.fetchall()
