@@ -41,6 +41,32 @@ def photos():
     return render_template("photos.html", photos=data)
 
 
+# ---------------------------- View further photo info -----------------------------------------------
+@app.route("/photos/<photoID>", methods=["GET"])
+def view_further_info(photoID):
+    # photo
+    query = "SELECT * FROM Photo WHERE photoID = %s"
+    with conn.cursor() as cursor:
+        cursor.execute(query, (photoID))
+    photo = cursor.fetchone()
+    # first last name
+    query = "SELECT firstName, lastName FROM Person WHERE username=%s"
+    with conn.cursor() as cursor:
+        cursor.execute(query, (session["username"]))
+    name = cursor.fetchone()
+    # tagged
+    # query = "SELECT username, firstName, lastName FROM Photo NATURAL JOIN TAGGED JOIN Person ON Person.photoPoster = Photo.photoID WHERE username=%s"
+    # with conn.cursor() as cursor:
+    #     cursor.execute(query, (session["username"]))
+    # tags = cursor.fetchone()
+
+    # query = "SELECT username FROM Tag WHERE photoID=%s AND acceptedTag=1"
+    # with conn.cursor() as cursor:
+    #     cursor.execute(query, (photoID))
+    # tags = cursor.fetchall()
+
+    return render_template("view_further_info.html", photo=photo, name=name)
+
 #Define route for login
 @app.route('/login')
 def login():
