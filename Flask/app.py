@@ -109,6 +109,8 @@ def uploadPhoto():
             with conn.cursor() as cursor:
                 query = "INSERT INTO Photo (postingDate, filePath, allFollowers, caption, photoPoster) VALUES (%s, %s, %s, %s, %s)"
                 cursor.execute(query, (time.strftime('%Y-%m-%d %H:%M:%S'), image_name, allFollowers, caption, userName))
+                conn.commit()
+                cursor.close()
 
         #visible to FriendGroup         
         else:
@@ -120,6 +122,8 @@ def uploadPhoto():
             query2 = "INSERT INTO SharedWith(groupOwner, groupName) VALUES (%s, %s)"
             with conn.cursor() as cursor:
                 cursor.execute(query1, (time.strftime('%Y-%m-%d %H:%M:%S'), image_name, allFollowers, caption, userName))
+                conn.commit()
+                cursor.close()
 
         message = "Image has been successfully uploaded."
         return render_template("upload.html", message=message)
