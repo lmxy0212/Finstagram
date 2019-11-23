@@ -6,8 +6,22 @@
 </head>
 <body>
     <h1>Visible Photos</h1>
-    <div>
+    <table>
+	<th>photoID</th>
+	<th>photoPoster</th>
 
-    </div>
-</body>
+    {% for photo in photos %}
+        <tr>
+            <td>{{photo.photoID}}</td>
+            <td>{{photo.photoPoster}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+    {% if message %}
+        {{ message }}
+    {% endif %}
+
+    <a href="/">Go back</a>
+    </body>
 </html>

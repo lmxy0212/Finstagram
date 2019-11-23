@@ -36,10 +36,9 @@ def photos():
            'WHERE photoID IN (SELECT photoID FROM SharedWith ' \
            'WHERE groupName IN (SELECT groupName FROM BelongTo ' \
            'WHERE member_username = %s OR owner_username = %s)) ORDER BY postingdate DESC'
-    cursor.execute(query, (photoID, photoID))
+    cursor.execute(query, (session['username'], session['username']))
     data = cursor.fetchall()
     return render_template("photos.html", photos=data)
-
 
 
 #Define route for login
@@ -47,10 +46,12 @@ def photos():
 def login():
     return render_template('login.html')
 
+
 #Define route for register
 @app.route('/register')
 def register():
     return render_template('register.html')
+
 
 #Authenticates the login
 @app.route('/loginAuth', methods=['GET', 'POST'])
