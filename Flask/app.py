@@ -25,10 +25,20 @@ def index():
     if "username" in session:
         return redirect(url_for("home"))
     return render_template("index.html")
+  
+#Make sure user is logged in for other actions
+def login_required(func):
+    @wraps(func)
+    def dec(*args, **kwargs):
+        if not "username" in session:
+            return redirect(url_for("login"))
+        return func(*args, **kwargs)
+    return dec
 
 
 # --------------------------------- show visible photos ----------------------------------------------
 @app.route("/photos", methods=["GET"])
+@login_required
 def photos():
     photoID = "1"
     cursor = conn.cursor()
@@ -43,6 +53,7 @@ def photos():
 
 # ---------------------------- View further photo info -----------------------------------------------
 @app.route("/photos/<photoID>", methods=["GET"])
+@login_required
 def view_further_info(photoID):
     # photo
     query = "SELECT * FROM Photo WHERE photoID = %s"
@@ -144,11 +155,13 @@ def registerAuth():
 
 
 @app.route('/home')
+@login_required
 def home():
     return render_template('home.html', username=session["username"])
 
 
 @app.route('/logout')
+@login_required
 def logout():
     session.pop('username')
     return redirect('/')
