@@ -3,4 +3,4 @@ A database project, a web application for sharing photos. Finstagram gives users
 
 ER Diagram for this database:
 
-![ER_diagram](/Users/ene/Documents/Finstagram/ER_diagram.png)
+![ER_diagram](/ER_diagram.png)
