@@ -57,28 +57,34 @@ def photos():
 @app.route("/photos/<photoID>", methods=["GET"])
 @login_required
 def view_further_info(photoID):
+
     # photo
     query = "SELECT * FROM Photo WHERE photoID = %s"
-    with conn.cursor() as cursor:
-        cursor.execute(query, (photoID))
+    cursor = conn.cursor()
+    cursor.execute(query, (photoID))
     photo = cursor.fetchone()
-    # first last name
+
+    # first last name of poster
     query = "SELECT firstName, lastName FROM Person WHERE username=%s"
-    with conn.cursor() as cursor:
-        cursor.execute(query, (session["username"]))
+    cursor = conn.cursor()
+    cursor.execute(query, (session["username"]))
     name = cursor.fetchone()
-    # tagged
-    # query = "SELECT username, firstName, lastName FROM Photo NATURAL JOIN TAGGED JOIN Person ON Person.photoPoster = Photo.photoID WHERE username=%s"
-    # with conn.cursor() as cursor:
-    #     cursor.execute(query, (session["username"]))
-    # tags = cursor.fetchone()
 
-    # query = "SELECT username FROM Tag WHERE photoID=%s AND acceptedTag=1"
-    # with conn.cursor() as cursor:
-    #     cursor.execute(query, (photoID))
-    # tags = cursor.fetchall()
+    # being tagged
+    query = "SELECT username, firstName, lastName " \
+            "FROM Tagged NATURAL JOIN Person " \
+            "WHERE photoID = %s AND tagstatus = 1"
+    conn.cursor()
+    cursor.execute(query, (photoID))
+    tags = cursor.fetchall()
 
-    return render_template("view_further_info.html", photo=photo, name=name)
+    # rating
+    query = 'SELECT username, rating FROM Likes WHERE photoID = %s'
+    cursor = conn.cursor()
+    cursor.execute(query, (photoID))
+    rating = cursor.fetchall()
+
+    return render_template("view_further_info.html", photo=photo, name=name, tags=tags, ratings=rating)
 
 
 @app.route("/photo/<image_name>", methods=["GET"])

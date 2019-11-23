@@ -4,19 +4,45 @@
     <meta charset="UTF-8">
     <title>Finstagram</title>
 </head>
-<body>
-    <h1>View Further Detail:</h1>
+<body style="background-color:yellow;">
+    <h1 style="color:rgb(155,123,235)">View Further Detail:</h1>
+
+
+    {#    -------------------------------- display person who post this ------------------------------------------#}
     <p><img src="/photo/{{photo.filepath}}" alt={{photo.photoID}}></p>
-        <h4>Name:</h4> {{name.firstName}}, {{name.lastName}}
-        <h4>Time stamp:</h4> {{photo.postingdate}}
-{#                <br>Posted by {{image.photoOwner}}{% if settings.displayTimestamp %} on {{image.timestamp}}{% endif %}#}
-{#    {% if tags.tagstatus != 0 %}<h4>Person being tagged:</h4>#}
-{#        {% for tag in tags %}#}
-{#            username: {{tag.username}}#}
-{#            name: {{ tags.firstName }}, {{ tags.lastName }}#}
-{#        {% endfor %}#}
-{#    {% endif %}#}
-        <h4>Caption: </h4>{{photo.caption}}
+        <h4 style="color:rgb(155,0,255)">Name:</h4> {{name.firstName}}, {{name.lastName}}
+        <h4 style="color:rgb(155,0,255)">Time stamp:</h4> {{photo.postingdate}}
+
+    <h4 style="color:rgb(155,0,255)">Caption: </h4>{{photo.caption}}
+
+
+    {#    -------------------------------- display tags ------------------------------------------#}
+    <h4 style="color:rgb(155,0,255)">Person being tagged in this photo:</h4>
+    <table>
+        <th>username ||</th>
+        <th>first name ||</th>
+        <th>last name</th>
+        {% for tag in tags %}
+            <tr>
+                <td>{{tag.username}}</td>
+                <td>{{tag.firstName}}</td>
+                <td>{{tag.lastName}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    {#    -------------------------------- display likes ------------------------------------------#}
+    <h4 style="color:rgb(155,0,255)">Person who liked this photo</h4>
+    <table>
+	<th>username ||</th>
+	<th>rating</th>
+    {% for rating in ratings %}
+        <tr>
+            <td>{{rating.username}}</td>
+            <td>{{rating.rating}}</td>
+        </tr>
+    {% endfor %}
+    </table>
 
     {% if message %}
         {{ message }}
