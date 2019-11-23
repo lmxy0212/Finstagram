@@ -4,6 +4,7 @@ import pymysql.cursors
 
 import time
 import hashlib
+from functools import wraps
 
 #Initialize the app from Flask
 app = Flask(__name__)
