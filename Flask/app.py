@@ -1,12 +1,12 @@
 #Import Flask Library
-from flask import Flask, render_template, request, session, url_for, redirect
+from flask import Flask, render_template, request, session, url_for, redirect, send_file
 import pymysql.cursors
 
 import time
 import hashlib
 from functools import wraps
 import os
-IMAGES_DIR = os.path.join(os.getcwd(), "images")
+IMAGES_DIR = os.path.join(os.getcwd(), "photos")
 
 #Initialize the app from Flask
 app = Flask(__name__)
@@ -43,7 +43,6 @@ def login_required(func):
 @app.route("/photos", methods=["GET"])
 @login_required
 def photos():
-    photoID = "1"
     cursor = conn.cursor()
     query = 'SELECT photoID, photoPoster FROM Photo ' \
            'WHERE photoID IN (SELECT photoID FROM SharedWith ' \
@@ -80,8 +79,15 @@ def view_further_info(photoID):
     # tags = cursor.fetchall()
 
     return render_template("view_further_info.html", photo=photo, name=name)
-  
- 
+
+
+@app.route("/photo/<image_name>", methods=["GET"])
+def image(image_name):
+    image_location = os.path.join(IMAGES_DIR, image_name)
+    if os.path.isfile(image_location):
+        return send_file(image_location, mimetype="image/jpg")
+
+
 # ---------------------------- Post A Photo -----------------------------------------------
 @app.route("/upload")
 @login_required
@@ -96,6 +102,7 @@ def uploadPhoto():
         image_file = request.files.get("imageToUpload", "")
         image_name = image_file.filename
         filepath = os.path.join(IMAGES_DIR, image_name)
+        print(filepath)
         image_file.save(filepath) 
 
         userName = session["username"]

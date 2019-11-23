@@ -6,7 +6,7 @@
 </head>
 <body>
     <h1>View Further Detail:</h1>
-        <p><img src="http://localhost/Users/ene/Documents/Finstagram/Flask/photos/1.JPG" alt={{photo.photoID}}></p>
+    <p><img src="/photo/{{photo.filepath}}" alt={{photo.photoID}}></p>
         <h4>Name:</h4> {{name.firstName}}, {{name.lastName}}
         <h4>Time stamp:</h4> {{photo.postingdate}}
 {#                <br>Posted by {{image.photoOwner}}{% if settings.displayTimestamp %} on {{image.timestamp}}{% endif %}#}
