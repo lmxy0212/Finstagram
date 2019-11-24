@@ -2,9 +2,12 @@
 <style>
     body {
         background-image: url("https://fischerinstitute.com/wp-content/uploads/2013/05/instagram-background.jpg");
-        background-repeat:no-repeat;
-        background-size:cover;
+        background-repeat: no-repeat;
+        background-size: cover;
+        text-justify: inter-word;
     }
+
+   
 </style>
     <head>
         <title>Photo Upload</title>
@@ -22,7 +25,7 @@
                 <option name = "All Followers" SELECTED>All Followers</option>
                
                 {% for group in groups%}
-                <option name = "Group Only">Group: {{group.groupName}}, Owner: {{group.owner_username}}</option>"
+                <option name = "Group Only">Group: {{group.groupName}} | Owner: {{group.owner_username}}</option>"
                 {% endfor %}
                 </select>
                 <br/>
