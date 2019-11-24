@@ -5,11 +5,13 @@
         background-repeat:no-repeat;
         background-size:cover;
         position: fixed;
-        top: 50%;
+        top: 80%;
         left: 50%;
+        zoom: 120%;
         margin-top: -350px;
         margin-left: -100px;
         overflow:auto;
+        zoom:130%;
     }
 </style>
 <head>
@@ -17,15 +19,16 @@
 <body text = "white">
 
 <form action="/loginAuth" method="POST">
-<input type="text" name = "username" placeholder="username" required/> </br>
-<input type="password" name = "password" placeholder="password" required/></br>
+<h2 style="color:lightcyan">Enter Username and Password to Login :)</h2>
+<p><input type="text" name = "username" placeholder="username" required/></p>
+<p><input type="password" name = "password" placeholder="password" required/></p><br>
 <input type="submit" value = Login />
 {% if error %}
     <p class="error"><strong>Error:</strong> {{error}}</p>
 {% endif %}
 </form>
 
-<a href="/">Go back</a>
+<a href="/" style="color:deepskyblue">Go back</a>
 
 
 

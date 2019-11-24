@@ -2,15 +2,24 @@
 <style>
     body {
         background-image: url("https://fischerinstitute.com/wp-content/uploads/2013/05/instagram-background.jpg");
+<<<<<<< HEAD
         background-repeat:no-repeat;
         background-size:cover;
         position: fixed;
-        top: 70%;
+        top: 80%;
         left: 50%;
         margin-top: -350px;
         margin-left: -100px;
         overflow:auto;
+        zoom:130%;
+=======
+        background-repeat: no-repeat;
+        background-size: cover;
+        text-justify: inter-word;
+>>>>>>> 7563776b6d7478e0a76b413616e3d1b3ab5d7ac4
     }
+
+   
 </style>
     <head>
         <title>Photo Upload</title>
@@ -21,18 +30,17 @@
             <form action="/uploadPhoto" method="post" enctype="multipart/form-data">
                 <input type="file" name="imageToUpload" accept="image/*">
                 <br/>
-                <input type = "text" name = "caption" placeholder="Enter the caption">
+                <p><input type = "text" name = "caption" placeholder="Enter the caption"></p>
 
-                <br/>
             <select name = "display">
                 <option name = "All Followers" SELECTED>All Followers</option>
                
                 {% for group in groups%}
-                <option name = "Group Only">Group: {{group.groupName}}, Owner: {{group.owner_username}}</option>"
+                <option name = "Group Only">Group: {{group.groupName}} | Owner: {{group.owner_username}}</option>"
                 {% endfor %}
                 </select>
                 <br/>
-                <input type="submit" value="Post">
+                <p><input type="submit" value="Post"></p>
 
             </form>
         </div>
