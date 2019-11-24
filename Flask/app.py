@@ -130,7 +130,7 @@ def uploadPhoto():
        #Shared with FriendGroup only         
         else:
             allFollowers = "0"
-            tag = display.split(",")
+            tag = display.split("|")
             groupName = tag[0].split(":")[1]
             groupOwner = tag[1].split(":")[1]
             query = "INSERT INTO Photo (postingDate, filePath, allFollowers, caption, photoPoster) VALUES (%s, %s, %s, %s, %s)"
