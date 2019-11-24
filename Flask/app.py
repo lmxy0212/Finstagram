@@ -127,7 +127,7 @@ def uploadPhoto():
                 conn.commit()
                 cursor.close()
 
-        #Shared with FriendGroup only         
+       #Shared with FriendGroup only         
         else:
             allFollowers = "0"
             tag = display.split(",")
@@ -138,18 +138,6 @@ def uploadPhoto():
                 cursor.execute(query, (time.strftime('%Y-%m-%d %H:%M:%S'), image_name, allFollowers, caption, userName))
                 conn.commit()
                 cursor.close()
-            query1 = "SELECT photoID FROM Photo"
-            cursor = conn.cursor()
-            cursor.execute(query1)
-            data = cursor.fetchone()
-            print(data)
-            photoID = data.values()
-            print(photoID)
-
-            query2 = "INSERT INTO SharedWith(groupOwner, groupName, photoID) VALUES (%s, %s, %s)"
-            cursor.execute(query2, (groupOwner, groupName, photoID))
-            conn.commit()
-            cursor.close()
 
         message = "photo successfully uploaded."
         return render_template("upload.html", message=message)
