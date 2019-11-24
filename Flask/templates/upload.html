@@ -6,7 +6,6 @@
         background-size:cover;
     }
 </style>
-    
     <head>
         <title>Photo Upload</title>
     </head>
@@ -19,11 +18,11 @@
                 <input type = "text" name = "caption" placeholder="Enter the caption">
 
                 <br/>
-              <select name = "display">
+            <select name = "display">
                 <option name = "All Followers" SELECTED>All Followers</option>
                
                 {% for group in groups%}
-                <option name = "group">Group:{{group.groupName}},Group Owner:{{group.groupOwner}}</option>"
+                <option name = "Group Only">Group: {{group.groupName}}, Owner: {{group.owner_username}}</option>"
                 {% endfor %}
                 </select>
                 <br/>
