@@ -101,7 +101,11 @@ def image(image_name):
 @app.route("/upload")
 @login_required
 def upload():
-    return render_template("upload.html")
+    query = "SELECT groupName, owner_username FROM BelongTo WHERE member_username = %s"
+    with conn.cursor() as cursor:
+        cursor.execute(query, (session["username"]))
+    data = cursor.fetchall()
+    return render_template("upload.html", groups = data)
 
 
 @app.route("/uploadPhoto", methods=["GET", "POST"])
@@ -111,43 +115,51 @@ def uploadPhoto():
         image_file = request.files.get("imageToUpload", "")
         image_name = image_file.filename
         filepath = os.path.join(IMAGES_DIR, image_name)
-        print(filepath)
         image_file.save(filepath) 
 
         userName = session["username"]
-        allFollowers = "0"
         caption = request.form.get('caption')
         display = request.form.get('display')
 
-        #visible to all followers
+        #Post to all followers
         if display == "All Followers":
             allFollowers = "1"
+            query = "INSERT INTO Photo (postingDate, filePath, allFollowers, caption, photoPoster) VALUES (%s, %s, %s, %s, %s)"
             with conn.cursor() as cursor:
-                query = "INSERT INTO Photo (postingDate, filePath, allFollowers, caption, photoPoster) VALUES (%s, %s, %s, %s, %s)"
                 cursor.execute(query, (time.strftime('%Y-%m-%d %H:%M:%S'), image_name, allFollowers, caption, userName))
                 conn.commit()
                 cursor.close()
 
-        #visible to FriendGroup         
+        #Shared with FriendGroup only         
         else:
-            res = display.split(",")
-            groupName = res[0].split(":")[1]
-            groupOwner = res[1].split(":")[1]
-            query1 = "INSERT INTO Photo (postingDate, filePath, allFollowers, caption, photoPoster) VALUES (%s, %s, %s, %s, %s)"
-            #insertion with SharedWith table (not sure???)
-            query2 = "INSERT INTO SharedWith(groupOwner, groupName) VALUES (%s, %s)"
+            allFollowers = "0"
+            tag = display.split(",")
+            groupName = tag[0].split(":")[1]
+            groupOwner = tag[1].split(":")[1]
+            query = "INSERT INTO Photo (postingDate, filePath, allFollowers, caption, photoPoster) VALUES (%s, %s, %s, %s, %s)"
             with conn.cursor() as cursor:
-                cursor.execute(query1, (time.strftime('%Y-%m-%d %H:%M:%S'), image_name, allFollowers, caption, userName))
+                cursor.execute(query, (time.strftime('%Y-%m-%d %H:%M:%S'), image_name, allFollowers, caption, userName))
                 conn.commit()
                 cursor.close()
+            query1 = "SELECT photoID FROM Photo"
+            cursor = conn.cursor()
+            cursor.execute(query1)
+            data = cursor.fetchone()
+            print(data)
+            photoID = data.values()
+            print(photoID)
 
-        message = "Image has been successfully uploaded."
+            query2 = "INSERT INTO SharedWith(groupOwner, groupName, photoID) VALUES (%s, %s, %s)"
+            cursor.execute(query2, (groupOwner, groupName, photoID))
+            conn.commit()
+            cursor.close()
+
+        message = "photo successfully uploaded."
         return render_template("upload.html", message=message)
 
     else:
-        message = "Failed to upload image."
-        return render_template("upload.html", message=message) 
-  
+        message = "Failed to upload photo"
+        return render_template("upload.html", message=message)
   
   
 
