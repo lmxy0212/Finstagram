@@ -124,7 +124,8 @@ def uploadPhoto():
         #Post to all followers
         if display == "All Followers":
             allFollowers = "1"
-            query = "INSERT INTO Photo (postingDate, filePath, allFollowers, caption, photoPoster) VALUES (%s, %s, %s, %s, %s)"
+            query = "INSERT INTO Photo (postingDate, filePath, allFollowers, caption, photoPoster) " \
+                    "VALUES (%s, %s, %s, %s, %s)"
             with conn.cursor() as cursor:
                 cursor.execute(query, (time.strftime('%Y-%m-%d %H:%M:%S'), image_name, allFollowers, caption, userName))
                 conn.commit()
@@ -136,7 +137,8 @@ def uploadPhoto():
             tag = display.split("|")
             groupName = tag[0].split(":")[1]
             groupOwner = tag[1].split(":")[1]
-            query = "INSERT INTO Photo (postingDate, filePath, allFollowers, caption, photoPoster) VALUES (%s, %s, %s, %s, %s)"
+            query = "INSERT INTO Photo (postingDate, filePath, allFollowers, caption, photoPoster)" \
+                    " VALUES (%s, %s, %s, %s, %s)"
             with conn.cursor() as cursor:
                 cursor.execute(query, (time.strftime('%Y-%m-%d %H:%M:%S'), image_name, allFollowers, caption, userName))
                 conn.commit()
