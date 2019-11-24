@@ -4,21 +4,30 @@
         background-image: url("https://fischerinstitute.com/wp-content/uploads/2013/05/instagram-background.jpg");
         background-repeat:no-repeat;
         background-size:cover;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        margin-top: -350px;
+        margin-left: -100px;
+        overflow:auto;
     }
 </style>
 <head>
 </head>
 <body text = "white">
+
 <form action="/loginAuth" method="POST">
-	<input type="text" name = "username" placeholder="username" required/> </br>
-	<input type="password" name = "password" placeholder="password" required/></br>
-	<input type="submit" value = Login />
-	{% if error %}
-		<p class="error"><strong>Error:</strong> {{error}}</p>
-	{% endif %}
+<input type="text" name = "username" placeholder="username" required/> </br>
+<input type="password" name = "password" placeholder="password" required/></br>
+<input type="submit" value = Login />
+{% if error %}
+    <p class="error"><strong>Error:</strong> {{error}}</p>
+{% endif %}
 </form>
 
 <a href="/">Go back</a>
+
+
 
 </body>
 

@@ -1,5 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+<style>
+    body{
+        position: fixed;
+        top: 80%;
+        left: 50%;
+        margin-top: -350px;
+        margin-left: -100px;
+        overflow:auto;
+        zoom:150%;
+}
+
+</style>
 <head>
     <meta charset="UTF-8">
     <title>Finstagram</title>
@@ -7,7 +19,7 @@
 <style>
     body {
         background-image: url("https://fischerinstitute.com/wp-content/uploads/2013/05/instagram-background.jpg");
-        background-repeat:no-repeat;
+        background-repeat:repeat;
         background-size:cover;
     }
 </style>
@@ -19,7 +31,7 @@
 
     {% for photo in photos %}
         <tr>
-            <td><a href="/photos/{{photo.photoID}}">{{photo.photoID}}</a></td>
+            <td><a href="/photos/{{photo.photoID}}" style="color:white">{{photo.photoID}}</a></td>
             <td>{{photo.photoPoster}}</td>
         </tr>
     {% endfor %}
@@ -29,6 +41,6 @@
         {{ message }}
     {% endif %}
 
-    <a href="/home">Go back</a>
+    <a href="/home" style="color:deepskyblue">Go back</a>
     </body>
 </html>

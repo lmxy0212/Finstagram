@@ -26,9 +26,12 @@ SALT = 'cs3083'
 @app.route('/')
 def index():
     if "username" in session:
-        return redirect(url_for("home"))
-    return render_template("index.html")
-  
+        return redirect(url_for('static', filename='home.html'))
+    # return render_template("index.html")
+    # data = open('templates/index.html').read()
+    # return data
+    return redirect(url_for('static', filename='index.html'))
+
 #Make sure user is logged in for other actions
 def login_required(func):
     @wraps(func)
@@ -227,7 +230,7 @@ def registerAuth():
 @app.route('/home')
 @login_required
 def home():
-    return render_template('home.html', username=session["username"])
+    return redirect(url_for('static', filename='home.html', username=session["username"]))
 
 
 @app.route('/logout')
