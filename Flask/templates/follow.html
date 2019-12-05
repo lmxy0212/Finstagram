@@ -1,0 +1,59 @@
+<html>
+<style>
+    body {
+        background-image: url("https://fischerinstitute.com/wp-content/uploads/2013/05/instagram-background.jpg");
+        background-repeat:no-repeat;
+        background-size:cover;
+        position: fixed;
+        top: 80%;
+        left: 50%;
+        margin-top: -350px;
+        margin-left: -100px;
+        overflow: auto;
+        zoom: 130%;
+        text-justify: inter-word;
+    }
+</style>
+    <head>
+        <title>Finstagram</title>
+    </head>
+    <body text= "white">
+          <div>
+
+              <form action="/search_follow" method="post">
+                <h3>Search for an user to follow: </h3>
+                <input type="text" name="username" placeholder="username" >
+                <br/>
+                <p><input type="submit" value="Follow"> </p>
+                </form>
+          </div>
+        <h3>Followers</h3>
+        <table>
+                {% for follower in followers %}
+                <p> {{follower.username_follower}}<p>
+            {% endfor %}  
+          </table>
+          <h3>Following</h3>
+          <table>
+              {% for followee in followees %}
+                  <p> {{followee.username_followed}}<p>
+              {% endfor %}  
+            </table>
+          
+          <div>
+              <h3>Follow Requests</h3>
+              <h6> (When people ask to follow you, you'll see their requests here.) </h6>
+              {% for wait in waits %}
+              <p> {{wait.username_follower}}
+              <form action = "/accept_follow/{{wait.username_follower}}" method = "POST">
+                  <input type="submit" value="Add Friend">
+               </form>
+              <form action = "/decline_follow/{{wait.username_follower}}" method = "POST">
+                  <input type="submit" value="Remove"><p>
+              </form>
+              {% endfor %}
+          </div>
+      
+          <a href="/">back</a>
+    </body>
+</html>
