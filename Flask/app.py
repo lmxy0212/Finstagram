@@ -82,12 +82,18 @@ def view_further_info(photoID):
     tags = cursor.fetchall()
 
     # rating
-    query = 'SELECT username, rating FROM Likes WHERE photoID = %s'
+    query = "SELECT username, rating FROM Likes WHERE photoID = %s"
     cursor = conn.cursor()
     cursor.execute(query, (photoID))
     rating = cursor.fetchall()
 
-    return render_template("view_further_info.html", photo=photo, name=name, tags=tags, ratings=rating)
+    #comment
+    query = "SELECT username, content FROM Comments WHERE photoID = %s"
+    cursor = conn.cursor()
+    cursor.execute(query, (photoID))
+    content = cursor.fetchall()
+
+    return render_template("view_further_info.html", photo=photo, name=name, tags=tags, ratings=rating, contents=content)
 
 
 @app.route("/photo/<image_name>", methods=["GET"])
@@ -151,6 +157,93 @@ def uploadPhoto():
         message = "Failed to upload photo"
         return render_template("upload.html", message=message)
   
+  # ---------------------------- Manage Follows -----------------------------------------------
+@app.route("/follow")
+@login_required
+def follow():
+    #follower
+    query = "SELECT * FROM Follow WHERE username_followed = %s AND followstatus = 1"
+    cursor = conn.cursor()
+    cursor.execute(query, (session["username"]))
+    follower = cursor.fetchall()
+
+    #following
+    query = "SELECT * FROM Follow WHERE username_follower = %s AND followstatus = 1"
+    cursor = conn.cursor()
+    cursor.execute(query, (session["username"]))
+    following = cursor.fetchall()
+    
+    #requestlst
+    query = "SELECT * FROM Follow WHERE username_followed = %s AND followstatus is NULL"
+    cursor = conn.cursor()
+    cursor.execute(query, (session["username"]))
+    requestlst = cursor.fetchall()
+
+    return render_template("follow.html", followers=follower,followees =following, waits = requestlst)
+
+@app.route("/search_follow", methods=["POST"])
+@login_required
+def searchFollow():
+    if request.form:
+        username = request.form["username"]
+        followstatus = None
+        try:
+            query = "INSERT INTO Follow (username_followed,username_follower,followstatus) VALUES (%s, %s,%s)"
+            with conn.cursor() as cursor:
+                cursor.execute(query, (username,session["username"], followstatus))
+        except pymysql.Error:
+            return redirect(url_for("follow"))
+        conn.commit()
+        cursor.close()
+        return redirect(url_for("follow"))
+
+@app.route("/accept_follow/<username_follower>", methods = ["POST"])
+@login_required
+def acceptFollow(username_follower):
+    with conn.cursor() as cursor:
+        query = "UPDATE Follow SET followstatus = 1 WHERE username_follower = %s AND username_followed = %s"
+        cursor.execute(query, (username_follower, session["username"]))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for("follow"))
+
+@app.route("/decline_follow/<username_follower>", methods = ["POST"])
+@login_required
+def declineFollow(username_follower):
+    with conn.cursor() as cursor:
+        query = "DELETE FROM Follow WHERE username_follower = %s AND username_followed = %s"
+        cursor.execute(query, (username_follower, session["username"]))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for("follow"))
+
+# ---------------------------- Like Photo -----------------------------------------------
+@app.route("/likes/<photoID>", methods=["POST"])
+@login_required
+def likes(photoID):
+    rating = request.form.get("rating")
+    try:
+        query = "INSERT INTO Likes (username, photoID, liketime, rating) VALUES (%s, %s, %s, %s)"
+        with conn.cursor() as cursor:
+            cursor.execute(query, (session["username"], photoID, time.strftime('%Y-%m-%d %H:%M:%S'), rating))
+    except pymysql.err.IntegrityError:
+        return redirect(url_for("view_further_info", photoID = photoID))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for("view_further_info", photoID = photoID))
+
+# ---------------------------- Add Comments -----------------------------------------------
+@app.route("/add_comment/<photoID>", methods=["POST"])
+@login_required
+def addComment(photoID):
+    content = request.form.get("content")
+    query = "INSERT INTO Comments (username, photoID, commenttime, content) VALUES (%s, %s, %s, %s)"
+    with conn.cursor() as cursor:
+        cursor.execute(query, (session["username"], photoID, time.strftime('%Y-%m-%d %H:%M:%S'), content))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('view_further_info', photoID=photoID))
+
   
 
 #Define route for login
