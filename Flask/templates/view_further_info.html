@@ -18,14 +18,37 @@
 </head>
 <body style="background-color:yellow;">
     <h1 style="color:rgb(155,123,235)">View Further Detail:</h1>
+    <p><img src="/photo/{{photo.filepath}}" alt={{photo.photoID}}></p>
+    {#    -------------------------------- like the photo------------------------------------------#}
+    <div>
+        <form action="/likes/{{photo.photoID}}" method="post" enctype="multipart/form-data">
+            <select name = "rating">
+                <option value = 1> 1 </option>
+                <option value = 2> 2 </option>
+                <option value = 3> 3 </option>
+                <option value = 4> 4 </option>
+                <option value = 5> 5 </option>
+            </select>
+            &nbsp&nbsp<input type="submit" value="LIKE!">
+
+        </form>
+    </div>
+    {#    -------------------------------- Comment the photo------------------------------------------#}
+    <p><div>
+        <form action="/add_comment/{{photo.photoID}}"  method="post">
+            <input type="text" name= "content" placeholder="Add comments..." >
+             &nbsp&nbsp<input type="submit" value="COMMENT!">
+        </form>
+    </div></p>
 
 
     {#    -------------------------------- display person who post this ------------------------------------------#}
-    <p><img src="/photo/{{photo.filepath}}" alt={{photo.photoID}}></p>
         <h4 style="color:rgb(155,0,255)">Name:</h4> {{name.firstName}}, {{name.lastName}}
         <h4 style="color:rgb(155,0,255)">Time stamp:</h4> {{photo.postingdate}}
 
     <h4 style="color:rgb(155,0,255)">Caption: </h4>{{photo.caption}}
+
+
 
 
     {#    -------------------------------- display tags ------------------------------------------#}
@@ -52,6 +75,19 @@
         <tr>
             <td>{{rating.username}}</td>
             <td>{{rating.rating}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+	
+    {#    -------------------------------- display comments ------------------------------------------#}
+    <h4 style="color:rgb(155,0,255)">Person who commented on this photo</h4>
+    <table>
+    <th>username ||</th>
+    <th>content</th>
+    {% for content in contents %}
+        <tr>
+            <td>{{content.username}}</td>
+            <td>{{content.content}}</td>
         </tr>
     {% endfor %}
     </table>
