@@ -47,10 +47,11 @@ def login_required(func):
 @login_required
 def photos():
     cursor = conn.cursor()
-    query = 'SELECT photoID, photoPoster FROM Photo ' \
-           'WHERE photoID IN (SELECT photoID FROM SharedWith ' \
-           'WHERE groupName IN (SELECT groupName FROM BelongTo ' \
-           'WHERE member_username = %s OR owner_username = %s)) ORDER BY postingdate DESC'
+    query = "SELECT photoID, photoPoster FROM Photo " \
+            "WHERE photoID IN (SELECT photoID FROM SharedWith " \
+            "WHERE groupName IN (SELECT groupName FROM BelongTo " \
+            "WHERE member_username = %s OR owner_username = %s)) " \
+            "ORDER BY postingdate DESC"
     cursor.execute(query, (session['username'], session['username']))
     data = cursor.fetchall()
     return render_template("photos.html", photos=data)
@@ -102,6 +103,43 @@ def image(image_name):
     if os.path.isfile(image_location):
         return send_file(image_location, mimetype="image/jpg")
 
+# ---------------------------- Search by poster -----------------------------------------------
+@app.route("/searchBy/<username>", methods=["GET"])
+@login_required
+def search_by_poster(username):
+    cursor = conn.cursor()
+    cleanup = "Drop View visiblephoto"
+    view = "CREATE VIEW visiblephoto AS " \
+            "SELECT photoID, photoPoster FROM Photo " \
+            "WHERE photoID IN (SELECT photoID FROM SharedWith " \
+            "WHERE groupName IN (SELECT groupName FROM BelongTo " \
+            "WHERE member_username = %s OR owner_username = %s)) " \
+            "ORDER BY postingdate DESC"
+    query = "SELECT * FROM visiblePhoto WHERE photoPoster = %s"
+    cursor.execute(view, (session['username'], session['username']))
+    cursor.execute(query, (username))
+    poster = cursor.fetchall()
+    cursor.execute(cleanup)
+    return render_template("search_by_poster.html", posts=poster, poster=username)
+
+# ---------------------------- Search by tag---------------------------------------------------
+@app.route("/photos/tag", methods=["POST"])
+@login_required
+def search_by_tag(tag):
+    cursor = conn.cursor()
+    cleanup = "Drop View visiblephoto"
+    view = "CREATE VIEW visiblephoto AS " \
+           "SELECT photoID, photoPoster FROM Photo " \
+           "WHERE photoID IN (SELECT photoID FROM SharedWith " \
+           "WHERE groupName IN (SELECT groupName FROM BelongTo " \
+           "WHERE member_username = %s OR owner_username = %s)) " \
+           "ORDER BY postingdate DESC"
+    query = "SELECT * FROM visiblePhoto WHERE photoPoster = %s"
+    # cursor.execute(cleanup)
+    cursor.execute(view, (session['username'], session['username']))
+    cursor.execute(query, (tag))
+    poster = cursor.fetchall()
+    return render_template("search_by_tag.html")
 
 # ---------------------------- Post A Photo -----------------------------------------------
 @app.route("/upload")

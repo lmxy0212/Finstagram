@@ -24,15 +24,13 @@
     }
 </style>
 <body text = "white">
-    <h1>Visible Photos</h1>
+    <h1>Photos posted by {{poster}}</h1>
     <table>
-	<th>photoID ||</th>
-	<th>photoPoster</th>
+	<th>photoID</th>
 
-    {% for photo in photos %}
+    {% for post in posts %}
         <tr>
-            <td><a href="/photos/{{photo.photoID}}" style="color:white">{{photo.photoID}}</a></td>
-            <td><a href="/searchBy/{{photo.photoPoster}}" style="color:white">{{photo.photoPoster}}</a></td>
+            <td><a href="/photos/{{post.photoID}}" style="color:white">{{post.photoID}}</a></td>
         </tr>
     {% endfor %}
     </table>
@@ -42,6 +40,6 @@
     {% endif %}
 
     <br/>
-    <a href="/home" style="color:deepskyblue">Go back</a>
+    <a href="/photos" style="color:deepskyblue">Go back</a>
     </body>
 </html>
