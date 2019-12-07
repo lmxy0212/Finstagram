@@ -3,9 +3,9 @@
 <style>
     body{
         position: fixed;
-        top: 50%;
+        top: 20%;
         left: 50%;
-        margin-top: -350px;
+        {#margin-top: -350px;#}
         margin-left: -100px;
         overflow:auto;
         zoom:150%;
@@ -24,20 +24,20 @@
     }
 </style>
 <body text = "white">
-{#    <h1>Photos posted by {{poster}}</h1>#}
-{#    <table>#}
-{#	<th>photoID</th>#}
-{##}
-{#    {% for post in posts %}#}
-{#        <tr>#}
-{#            <td><a href="/photos/{{post.photoID}}" style="color:white">{{post.photoID}}</a></td>#}
-{#        </tr>#}
-{#    {% endfor %}#}
-{#    </table>#}
-{##}
-{#    {% if message %}#}
-{#        {{ message }}#}
-{#    {% endif %}#}
+    <h1>Photos {{tagged_person}} was tagged in</h1>
+    <table>
+	<th>photoID</th>
+
+    {% for photo in photos %}
+        <tr>
+            <td><a href="/photos/{{photo.photoID}}" style="color:white">{{photo.photoID}}</a></td>
+        </tr>
+    {% endfor %}
+    </table>
+
+    {% if message %}
+        {{ message }}
+    {% endif %}
 
     <br/>
     <a href="/photos" style="color:deepskyblue">Go back</a>

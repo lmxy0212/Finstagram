@@ -3,9 +3,9 @@
 <style>
     body{
         position: fixed;
-        top: 50%;
+        top: 20%;
         left: 50%;
-        margin-top: -350px;
+        {#margin-top: -350px;#}
         margin-left: -100px;
         overflow:auto;
         zoom:150%;
@@ -24,6 +24,22 @@
     }
 </style>
 <body text = "white">
+    {#    -------------------------------- search by poster ------------------------------------------#}
+    <p><div>
+        <form action="/searchByuser"  method="post">
+            <input type="text" name= "username" placeholder="Search by poster..." >
+             &nbsp&nbsp<input type="submit" value="Search!">
+        </form>
+    </div></p>
+    {#    -------------------------------- search by tag ------------------------------------------#}
+    <p><div>
+        <form action="/searchBytag"  method="post">
+            <input type="text" name= "tagged_person" placeholder="Search by tag..." >
+             &nbsp&nbsp<input type="submit" value="Search!">
+        </form>
+    </div></p>
+
+    {#    -------------------------------- show visible photos ------------------------------------------#}
     <h1>Visible Photos</h1>
     <table>
 	<th>photoID ||</th>
@@ -32,7 +48,7 @@
     {% for photo in photos %}
         <tr>
             <td><a href="/photos/{{photo.photoID}}" style="color:white">{{photo.photoID}}</a></td>
-            <td><a href="/searchBy/{{photo.photoPoster}}" style="color:white">{{photo.photoPoster}}</a></td>
+            <td>{{photo.photoPoster}}</td>
         </tr>
     {% endfor %}
     </table>

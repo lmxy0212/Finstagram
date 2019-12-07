@@ -104,9 +104,10 @@ def image(image_name):
         return send_file(image_location, mimetype="image/jpg")
 
 # ---------------------------- Search by poster -----------------------------------------------
-@app.route("/searchBy/<username>", methods=["GET"])
+@app.route("/searchByuser", methods=["POST"])
 @login_required
-def search_by_poster(username):
+def search_by_poster():
+    username = request.form.get("username")
     cursor = conn.cursor()
     cleanup = "Drop View visiblephoto"
     view = "CREATE VIEW visiblephoto AS " \
@@ -123,9 +124,10 @@ def search_by_poster(username):
     return render_template("search_by_poster.html", posts=poster, poster=username)
 
 # ---------------------------- Search by tag---------------------------------------------------
-@app.route("/photos/tag", methods=["POST"])
+@app.route("/searchBytag", methods=["POST"])
 @login_required
-def search_by_tag(tag):
+def search_by_tag():
+    tagged_person = request.form.get("tagged_person")
     cursor = conn.cursor()
     cleanup = "Drop View visiblephoto"
     view = "CREATE VIEW visiblephoto AS " \
@@ -134,12 +136,12 @@ def search_by_tag(tag):
            "WHERE groupName IN (SELECT groupName FROM BelongTo " \
            "WHERE member_username = %s OR owner_username = %s)) " \
            "ORDER BY postingdate DESC"
-    query = "SELECT * FROM visiblePhoto WHERE photoPoster = %s"
-    # cursor.execute(cleanup)
+    query = "SELECT photoID FROM Tagged WHERE username = %s AND tagstatus = 1"
     cursor.execute(view, (session['username'], session['username']))
-    cursor.execute(query, (tag))
-    poster = cursor.fetchall()
-    return render_template("search_by_tag.html")
+    cursor.execute(query, (tagged_person))
+    photos = cursor.fetchall()
+    cursor.execute(cleanup)
+    return render_template("search_by_tag.html", tagged_person=tagged_person, photos=photos)
 
 # ---------------------------- Post A Photo -----------------------------------------------
 @app.route("/upload")
