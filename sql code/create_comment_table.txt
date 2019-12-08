@@ -1,0 +1,9 @@
+CREATE TABLE Comments(
+    username VARCHAR(20), 
+    photoID int, 
+    commenttime DATETIME, 
+    content VARCHAR(1024),
+    PRIMARY KEY(username, photoID), 
+    FOREIGN KEY(username) REFERENCES Person(username),
+    FOREIGN KEY(photoID) REFERENCES Photo(photoID)
+);  
