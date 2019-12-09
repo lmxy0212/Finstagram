@@ -180,9 +180,6 @@ def uploadPhoto():
        #Shared with FriendGroup only         
         else:
             allFollowers = "0"
-            tag = display.split("|")
-            groupName = tag[0].split(":")[1]
-            groupOwner = tag[1].split(":")[1]
             query = "INSERT INTO Photo (postingDate, filePath, allFollowers, caption, photoPoster)" \
                     " VALUES (%s, %s, %s, %s, %s)"
             with conn.cursor() as cursor:
@@ -277,13 +274,15 @@ def likes(photoID):
 @login_required
 def addComment(photoID):
     content = request.form.get("content")
-    query = "INSERT INTO Comments (username, photoID, commenttime, content) VALUES (%s, %s, %s, %s)"
-    with conn.cursor() as cursor:
-        cursor.execute(query, (session["username"], photoID, time.strftime('%Y-%m-%d %H:%M:%S'), content))
+    try:
+        query = "INSERT INTO Comments (username, photoID, commenttime, content) VALUES (%s, %s, %s, %s)"
+        with conn.cursor() as cursor:
+            cursor.execute(query, (session["username"], photoID, time.strftime('%Y-%m-%d %H:%M:%S'), content))
+    except pymysql.err.IntegrityError: 
+        return redirect(url_for('view_further_info', photoID=photoID))      
     conn.commit()
     cursor.close()
     return redirect(url_for('view_further_info', photoID=photoID))
-
   
 
 #Define route for login
@@ -336,6 +335,7 @@ def registerAuth():
     hashed_password = hashlib.sha256(password.encode('utf - 8')).hexdigest()
     firstName = request.form["fname"]
     lastName = request.form["lname"]
+    bio = request.form["bio"]
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
@@ -352,15 +352,14 @@ def registerAuth():
     else:
         try:
             with conn.cursor() as cursor:
-                query = "INSERT INTO person (username, password, firstName, lastName) VALUES (%s, %s, %s, %s)"
-                cursor.execute(query, (username, hashed_password, firstName, lastName))
+                query = "INSERT INTO person (username, password, firstName, lastName, bio) VALUES (%s, %s, %s, %s, %s)"
+                cursor.execute(query, (username, hashed_password, firstName, lastName, bio))
         except pymysql.err.IntegrityError:
             error = "%s is already taken." % (username)
             return render_template('register.html', error=error)
         conn.commit()
         cursor.close()
         return redirect(url_for("login"))
-
 
 @app.route('/home')
 @login_required
