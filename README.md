@@ -3,7 +3,7 @@
 
 <u>**Project Demo:**</u>
 
-- Deco part one:
+- Demo part one:
 
   ​https://youtu.be/K1gJx9kcRMw
   
